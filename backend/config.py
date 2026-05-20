@@ -15,7 +15,13 @@ class Settings(BaseSettings):
     DATABASE_URL: str = f"sqlite:///{(PROJECT_ROOT / 'mace_chatbot.db').as_posix()}"
     DATA_DIR: str = str(PROJECT_ROOT / "data")
     PORT: int = 8000
-    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173"
+    # Semicolon-separated for Windows paths with commas unlikely; comma-separated origins
+    CORS_ORIGINS: str = (
+        "http://localhost:3000,http://127.0.0.1:3000,"
+        "http://localhost:5173,http://127.0.0.1:5173"
+    )
+    # If True (recommended for local dev): allow any Origin; disables cookie credentials on CORS
+    CORS_ALLOW_ALL: bool = True
 
     model_config = SettingsConfigDict(
         env_file=(PROJECT_ROOT / ".env", BACKEND_DIR / ".env"),

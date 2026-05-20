@@ -1,7 +1,17 @@
-// In dev, use Vite proxy (/api -> backend) to avoid CORS and connection issues
-const API_BASE = import.meta.env.DEV
-  ? "/api"
-  : (import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://127.0.0.1:8000");
+/** Dev/proxy vs production backend URL */
+function resolveApiBase() {
+  const envUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+  const isDev = !!import.meta.env.DEV;
+  if (isDev) {
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}/api`;
+    }
+    return "/api";
+  }
+  return envUrl || "http://127.0.0.1:8000";
+}
+
+const API_BASE = resolveApiBase();
 
 async function request(path, options = {}) {
   const headers = {
@@ -9,10 +19,18 @@ async function request(path, options = {}) {
     ...(options.headers || {}),
   };
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers,
-  });
+  const url = `${API_BASE}${path}`;
+  let response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+    });
+  } catch (err) {
+    const msg =
+      err?.message || "Network error — is the backend running on port 8000?";
+    throw new Error(msg);
+  }
 
   let data = null;
   const text = await response.text();
