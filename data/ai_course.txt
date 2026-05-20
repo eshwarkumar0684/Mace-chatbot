@@ -1,0 +1,53 @@
+Course Title: AI & ML with Generative AI
+Provider: MACE AI Academy
+Duration: 6 Months (24 Weeks)
+Format: Hybrid (Live Interactive Online Classes + In-person Practical Labs)
+Fee Structure: Total Course Fee is INR 75,000. Easy Monthly Installments (EMI) option is available starting from INR 6,250 per month. A 10% discount is available for lump-sum one-time payments.
+
+Course Objectives:
+This program is designed to take students from foundational programming to advanced AI, machine learning models, and cutting-edge Generative AI techniques. It focuses heavily on hands-on practical applications, real-world case studies, and vibe coding.
+
+Syllabus & Course Modules:
+
+Module 1: Foundations of Python & Mathematics for AI (Weeks 1-4)
+- Python Programming Essentials: Data structures, functions, OOP concepts.
+- Mathematics for Machine Learning: Linear algebra, calculus, probability, and statistics.
+- Data manipulation with NumPy and Pandas. Data visualization with Matplotlib and Seaborn.
+
+Module 2: Machine Learning Fundamentals (Weeks 5-8)
+- Supervised Learning: Linear Regression, Logistic Regression, Decision Trees, Random Forests, Support Vector Machines (SVM).
+- Unsupervised Learning: K-Means Clustering, PCA (Principal Component Analysis), Hierarchical Clustering.
+- Model Evaluation & Tuning: Cross-validation, Hyperparameter tuning, Bias-Variance tradeoff, Precision, Recall, F1-Score, ROC-AUC.
+
+Module 3: Deep Learning & Neural Networks (Weeks 9-12)
+- Introduction to Neural Networks: Perceptrons, Multi-layer Perceptrons (MLP), Activation Functions, Backpropagation.
+- Deep Learning Frameworks: PyTorch and TensorFlow basics.
+- Convolutional Neural Networks (CNNs) for Image Processing.
+- Recurrent Neural Networks (RNNs) and LSTMs for Sequential Data.
+
+Module 4: Generative AI, Large Language Models (LLMs) & Prompt Engineering (Weeks 13-16)
+- Transformers Architecture: Self-attention mechanism, Encoder-Decoder architectures.
+- Introduction to LLMs: GPT-4, Llama 3, Claude, Gemma.
+- Prompt Engineering Techniques: Zero-shot, Few-shot prompting, Chain-of-Thought (CoT), System Prompts.
+- API Integrations: Using OpenAI and Groq APIs in Python.
+
+Module 5: Advanced RAG (Retrieval-Augmented Generation) & Vector Databases (Weeks 17-20)
+- RAG Pipelines: Document loaders, text splitters, chunking strategies.
+- Embeddings: Sentence Transformers, OpenAI embeddings.
+- Vector Databases: ChromaDB, Pinecone, FAISS.
+- LangChain Framework: Chains, Agents, Tool use, Memory.
+
+Module 6: Capstone Project & AI Agent Deployment (Weeks 21-24)
+- AI Agents: Creating autonomous agents with LangGraph or CrewAI.
+- Web Application Integration: Streamlit, FastAPI, React/Next.js frontend connection.
+- Model Deployment: Dockerizing applications, deploying to AWS, Render, or Hugging Face Spaces.
+- Capstone Project: End-to-end design, implementation, and deployment of a custom AI Agent or RAG application.
+
+Prerequisites:
+No prior coding experience required, though basic logical reasoning is highly recommended. We start Python from absolute scratch.
+
+Certification:
+Graduates receive a "Professional Certification in AI & ML with Generative AI" from MACE AI Academy, co-signed by industrial partners.
+
+Career Opportunities:
+AI Engineer, Machine Learning Engineer, NLP Engineer, GenAI Developer, Prompt Engineer, AI Consultant.

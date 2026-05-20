@@ -1,0 +1,35 @@
+MACE AI Academy General FAQs
+
+Q: Who is MACE AI Academy?
+A: MACE AI Academy is a premier training institution focused on Artificial Intelligence, Machine Learning, Data Science, Data Analytics, and AI Agent development. We provide hands-on, job-oriented hybrid programs designed to bridge the gap between academia and industry.
+
+Q: What courses are offered at MACE AI Academy?
+A: We currently offer:
+1. AI & ML with Generative AI (6 Months, INR 75,000)
+2. Data Science with Generative AI (6 Months, INR 70,000)
+3. Data Analytics with Generative AI (4 Months, INR 50,000)
+4. We also offer specialized bootcamps in Vibe Coding, Prompt Engineering, and AI Agents.
+
+Q: What is the fee payment structure?
+A: You can pay the total fee in a lump sum (which gives you a 10% discount) or opt for our interest-free Easy Monthly Installments (EMI) plans:
+- AI & ML with Generative AI: INR 6,250 per month
+- Data Science with Generative AI: INR 5,833 per month
+- Data Analytics with Generative AI: INR 4,166 per month
+
+Q: Are classes online or offline?
+A: Classes are hybrid. They include live interactive online sessions for theoretical concepts and coding walk-throughs, along with physical/in-person practical labs at our academy for projects, mentoring, and collaborative team tasks.
+
+Q: Do you offer placement support?
+A: Yes! We offer 100% Placement Assistance. This includes resume review sessions, mock interviews with industry experts, portfolio construction (showcasing your Git repositories and deployed web apps), and direct referrals to our 50+ hiring partner companies.
+
+Q: Is there any coding prerequisite?
+A: No. All our courses start programming from the absolute ground up (Python or SQL). As long as you have logical reasoning skills and a commitment to learn, you can succeed.
+
+Q: What certification do I receive?
+A: Upon successfully completing the course requirements and the Capstone Project, you receive a "Professional Certification" from MACE AI Academy, which is widely recognized and co-signed by leading tech companies.
+
+Q: How can I apply or register?
+A: You can fill out the contact form on our website, submit your details through our Chatbot Lead Collector, or visit our campus. An academic counselor will reach out to you within 24 hours to schedule a counseling call.
+
+Q: Can I transition to AI from a non-technical background?
+A: Absolutely. Over 40% of our students come from non-IT backgrounds (like commerce, arts, sales, mechanical engineering). The syllabus is designed to step-by-step transition you into a professional AI role.

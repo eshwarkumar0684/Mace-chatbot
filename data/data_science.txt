@@ -1,0 +1,49 @@
+Course Title: Data Science with Generative AI
+Provider: MACE AI Academy
+Duration: 6 Months (24 Weeks)
+Format: Hybrid (Live Interactive Online Classes + In-person Practical Labs)
+Fee Structure: Total Course Fee is INR 70,000. Easy Monthly Installments (EMI) option is available starting from INR 5,833 per month. A 10% discount is available for lump-sum one-time payments.
+
+Course Objectives:
+This program is tailored to build complete data scientists who can utilize AI tools, automate data processing workflows, and use LLMs for advanced data analysis, forecasting, and data storytelling.
+
+Syllabus & Course Modules:
+
+Module 1: Data Analysis Foundations & SQL (Weeks 1-4)
+- Structured Query Language (SQL): Querying, Joins, Aggregations, Subqueries, window functions.
+- Advanced Excel for Analytics.
+- Python for Data Science: Pandas, NumPy, and data wrangling techniques.
+
+Module 2: Exploratory Data Analysis & Statistics (Weeks 5-8)
+- Statistics for Data Science: Descriptive and inferential statistics, hypothesis testing, A/B testing, ANOVA.
+- Exploratory Data Analysis (EDA): Data cleaning, handling missing values, outlier detection.
+- Data Visualization: Seaborn, Plotly, Tableau, and PowerBI dashboards.
+
+Module 3: Machine Learning for Data Science (Weeks 9-12)
+- Regression Models: Linear regression, Ridge, Lasso.
+- Classification Models: Logistic regression, Decision Trees, K-Nearest Neighbors (KNN), Random Forest.
+- Time Series Forecasting: ARIMA, SARIMA, Prophet.
+
+Module 4: Generative AI for Data Science (Weeks 13-16)
+- AI-Assisted Data Analysis: Using GitHub Copilot, ChatGPT, and Claude for code generation, bug fixing, and SQL writing.
+- Automating EDA: Prompting LLMs to extract insights from CSV/Excel data.
+- Synthetic Data Generation: Using Generative Models (GANs, LLMs) to generate synthetic test datasets.
+
+Module 5: LLMs in Business Intelligence & Production (Weeks 17-20)
+- Natural Language to SQL (NL2SQL): Building LLM agents that query SQL databases from plain text.
+- Text Analytics & NLP: Sentiment analysis, text classification, Named Entity Recognition (NER).
+- PDF Data Extraction: Using LLMs to extract structured JSON data from unstructured PDF reports.
+
+Module 6: Capstone Project & Dashboard Deployment (Weeks 21-24)
+- Designing interactive dashboards connected to real-time predictive models.
+- Building an AI-powered Business Intelligence Chatbot.
+- Deploying machine learning models using FastAPI and Docker to cloud platforms.
+
+Prerequisites:
+Basic mathematical understanding (High School level). No coding background is required.
+
+Certification:
+Graduates receive a "Professional Certification in Data Science with Generative AI" from MACE AI Academy.
+
+Career Opportunities:
+Data Scientist, Data Analyst, Business Intelligence Developer, Machine Learning Engineer, Analytics Consultant, AI Data Specialist.

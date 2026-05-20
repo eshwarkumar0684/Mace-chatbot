@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: mace-chatbot-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./chroma_db:/app/chroma_db
+      - ./mace_chatbot.db:/app/mace_chatbot.db
+    env_file:
+      - .env
+    environment:
+      PORT: "8000"
+      CHROMA_DB_DIR: /app/chroma_db
+      DATABASE_URL: sqlite:////app/mace_chatbot.db
+      DATA_DIR: /app/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+    container_name: mace-chatbot-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

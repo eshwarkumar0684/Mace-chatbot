@@ -1,0 +1,37 @@
+Course Title: Data Analytics with Generative AI
+Provider: MACE AI Academy
+Duration: 4 Months (16 Weeks)
+Format: Hybrid (Live Interactive Online Classes + In-person Practical Labs)
+Fee Structure: Total Course Fee is INR 50,000. Easy Monthly Installments (EMI) option is available starting from INR 4,166 per month. A 10% discount is available for lump-sum one-time payments.
+
+Course Objectives:
+This program is designed for students and professionals looking to master data visualization, reporting, business intelligence, and AI-enabled dashboard generation. It focuses on turning raw data into actionable business insights.
+
+Syllabus & Course Modules:
+
+Module 1: Excel & SQL Foundations (Weeks 1-4)
+- Intermediate to Advanced Microsoft Excel: Pivot tables, VLOOKUP, XLOOKUP, macros.
+- Structured Query Language (SQL): Database schemas, SELECT queries, filters, joins, groupings, and aggregating data.
+
+Module 2: Business Intelligence with Power BI & Tableau (Weeks 5-8)
+- Power BI: Power Query, Data Modeling, DAX (Data Analysis Expressions) formulas, creating interactive dashboards.
+- Tableau: Connecting data, building sheets, formatting dashboards, calculated fields, maps, and storyboards.
+
+Module 3: Python for Data Analysts (Weeks 9-12)
+- Introduction to Python programming.
+- Data manipulation with Pandas: Loading files, filtering, cleaning, sorting.
+- Data visualization using Matplotlib and Seaborn.
+
+Module 4: Generative AI for Analysts & Capstone (Weeks 13-16)
+- Prompting for Analytics: Using LLMs to interpret dashboard charts, write SQL queries, and generate business reports.
+- Advanced AI tools: Claude Projects, ChatGPT Advanced Data Analysis.
+- Capstone Project: Creating a comprehensive interactive Power BI or Tableau dashboard and presenting a business case study using AI-generated reports.
+
+Prerequisites:
+Open to all backgrounds. Basic computer literacy is required.
+
+Certification:
+Graduates receive a "Professional Certification in Data Analytics with Generative AI" from MACE AI Academy.
+
+Career Opportunities:
+Data Analyst, Business Analyst, BI Analyst, Reporting Analyst, Operations Analyst, Data Coordinator.
