@@ -3,11 +3,13 @@ import { formatMessageTime } from "./formatTime";
 export const COUNSELOR_GREETING = {
   id: "welcome-greeting",
   role: "assistant",
-  content: `Hi there! 👋 I'm your **MACE AI Academy** counselor.
+  content: `Hi! 👋 I'm your **MACE AI Academy** counselor.
 
-I'm here to chat about our courses, fees, career paths, and anything else on your mind about learning AI and data science.
+- Ask about **courses**, **fees**, **placements**, or **certifications**
+- **Book a free demo** — tap the calendar button below
+- I'll keep answers short and in bullet points
 
-What would you like to explore today?`,
+What would you like to know?`,
   timestamp: formatMessageTime(),
 };
 
@@ -52,7 +54,7 @@ export function getFollowUpSuggestions(lastUserMessage = "", lastBotMessage = ""
 
   return [
     "What courses do you offer?",
+    "Book a free demo session",
     "Compare fees across programs",
-    "I'd like a callback from a counselor",
   ];
 }

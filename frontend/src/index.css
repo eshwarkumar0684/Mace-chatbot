@@ -13,8 +13,111 @@ body,
   margin: 0;
 }
 
+html {
+  color-scheme: light;
+}
+
 body {
   overflow: hidden;
+  background: #ffffff;
+  color: #111827;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+@layer components {
+  .widget-shell {
+    @apply flex flex-col overflow-hidden rounded-3xl border border-surface-border bg-surface shadow-float;
+  }
+
+  .launcher-fab {
+    @apply relative flex h-20 w-20 items-center justify-center rounded-full border-0 bg-transparent p-0 shadow-none transition-transform duration-300 sm:h-[84px] sm:w-[84px];
+  }
+
+  .ui-card {
+    @apply rounded-2xl border border-surface-border bg-surface-muted transition-all duration-200;
+  }
+
+  .ui-card:hover {
+    @apply border-accent/30 bg-accent-light shadow-card;
+  }
+
+  /* MACE logo badge — white circle, light border, premium SaaS style */
+  .mace-logo-circle {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .mace-logo-frame {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .mace-logo-inline {
+    @apply relative inline-flex shrink-0 items-center justify-center;
+  }
+
+  .mace-logo-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+    image-rendering: auto;
+    filter: none;
+    opacity: 1;
+  }
+
+  .bubble-user {
+    @apply rounded-2xl rounded-tr-md px-4 py-3 text-[14px] leading-relaxed text-white;
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  }
+
+  .bubble-bot {
+    @apply rounded-2xl rounded-tl-md border border-surface-border bg-surface-muted px-4 py-3 text-[14px] leading-relaxed text-ink shadow-input;
+  }
+
+  .widget-input-bar {
+    @apply flex items-center gap-2 rounded-2xl border border-surface-border bg-surface px-3 py-2 shadow-input;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white shadow-input transition duration-200 hover:bg-accent-hover;
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-surface-border bg-surface px-4 py-2 text-sm font-medium text-ink transition duration-200 hover:border-accent/40 hover:bg-accent-light;
+  }
+
+  .btn-icon {
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted transition duration-200 hover:bg-surface-muted hover:text-ink;
+  }
+
+  .btn-icon-danger:hover {
+    @apply bg-red-50 text-red-600;
+  }
+
+  .field-input {
+    @apply w-full rounded-xl border border-surface-border bg-surface px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink-muted focus:border-accent focus:ring-2 focus:ring-accent/20;
+  }
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -22,15 +125,19 @@ body {
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #3b4254;
+  background: #d1d5db;
   border-radius: 999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .typing-cursor::after {
   content: "|";
   animation: blink 1s step-end infinite;
   margin-left: 2px;
-  color: #10a37f;
+  color: #2563eb;
 }
 
 @keyframes blink {
@@ -40,18 +147,37 @@ body {
 }
 
 .bot-message-content strong {
-  color: #6ee7b7;
+  color: #1d4ed8;
   font-weight: 600;
 }
 
 .bot-message-content .section-title {
-  color: #a7f3d0;
+  color: #111827;
   font-weight: 600;
-  margin-top: 0.75rem;
+  margin-top: 0.65rem;
   margin-bottom: 0.35rem;
 }
 
 .bot-message-content .course-item,
 .bot-message-content .check-item {
-  color: #d1d5db;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.animate-message-in {
+  animation: message-in 0.3s ease-out forwards;
+}
+
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

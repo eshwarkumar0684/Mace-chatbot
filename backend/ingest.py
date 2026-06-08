@@ -119,8 +119,9 @@ def rebuild_vector_db() -> bool:
         logger.info("ChromaDB vector database successfully rebuilt.")
 
         try:
-            from backend.rag_pipeline import rag_pipeline
-            rag_pipeline.reload()
+            from backend.rag_pipeline import get_rag_pipeline
+
+            get_rag_pipeline().reload()
         except Exception:
             pass
 

@@ -29,7 +29,7 @@ function renderInline(text) {
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={i} className="font-semibold text-emerald-300">
+        <strong key={i} className="font-semibold text-accent">
           {part.slice(2, -2)}
         </strong>
       );
@@ -54,7 +54,7 @@ function isCheckLine(line) {
 
 export default function MessageContent({ content, isTyping }) {
   if (!content && isTyping) {
-    return <span className="typing-cursor text-slate-500"> </span>;
+    return <span className="typing-cursor text-ink-muted"> </span>;
   }
 
   const lines = content.split("\n");
@@ -86,8 +86,8 @@ export default function MessageContent({ content, isTyping }) {
     if (isCheckLine(trimmed)) {
       const text = trimmed.replace(/^[-•*✓✔]\s*/, "");
       elements.push(
-        <div key={idx} className="check-item text-[14px] text-gray-300">
-          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded bg-emerald-100 text-emerald-600">
+        <div key={idx} className="check-item text-[15px] text-ink">
+          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded bg-accent/20 text-accent">
             <Check size={12} strokeWidth={3} />
           </span>
           <span>{renderInline(text)}</span>
@@ -100,7 +100,7 @@ export default function MessageContent({ content, isTyping }) {
       const text = trimmed.replace(/^[-•*]\s+/, "");
       const Icon = pickIcon(text);
       elements.push(
-        <div key={idx} className="course-item text-[14px] text-gray-300">
+        <div key={idx} className="course-item text-[15px] text-ink">
           {Icon ? (
             <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-muted text-accent">
               <Icon size={13} />
@@ -115,7 +115,7 @@ export default function MessageContent({ content, isTyping }) {
     }
 
     elements.push(
-      <p key={idx} className="text-[14px] leading-relaxed text-gray-300">
+      <p key={idx} className="text-[15px] leading-relaxed text-ink">
         {renderInline(trimmed)}
         {idx === lines.length - 1 && isTyping && <span className="typing-cursor" />}
       </p>

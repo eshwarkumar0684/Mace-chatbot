@@ -1,0 +1,28 @@
+"""Backward-compatible re-exports — canonical module is backend.email_service."""
+
+from backend.email_service import (  # noqa: F401
+    EMAIL_STATUS_FAILED,
+    EMAIL_STATUS_PENDING,
+    EMAIL_STATUS_SENT,
+    build_confirmation_email,
+    create_email_log,
+    email_delivery_summary,
+    get_email_log,
+    get_latest_email_log_for_booking,
+    init_email_logs_table,
+    is_resend_configured,
+    is_smtp_configured,
+    is_valid_recipient,
+    list_email_logs,
+    get_resend_status,
+    log_resend_configuration,
+    mask_api_key,
+    normalize_recipient,
+    resolve_sender_address,
+    retry_confirmation_email,
+    send_confirmation_email,
+    send_otp_email,
+    send_reset_email,
+    send_test_email,
+    update_email_log,
+)

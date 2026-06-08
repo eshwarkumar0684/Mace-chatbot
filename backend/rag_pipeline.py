@@ -175,11 +175,20 @@ class RAGPipeline:
             )
         ][:6]
 
-        summary = "\n".join(matching) if matching else context[:400]
+        raw = matching if matching else [context[:300]]
+        bullets = "\n".join(f"- {line[:120].strip()}" for line in raw[:6] if line.strip())
         return (
-            f"{greeting}Based on what we offer at MACE:\n\n{summary}\n\n"
-            "Would you like me to go deeper on any one course or talk about fees and EMI?"
+            f"{greeting}Here's what I can share:\n\n{bullets}\n\n"
+            "Want details on fees, syllabus, or placements?"
         )
 
 
-rag_pipeline = RAGPipeline()
+_pipeline: RAGPipeline | None = None
+
+
+def get_rag_pipeline() -> RAGPipeline:
+    """Lazy singleton — avoids blocking uvicorn startup on embedding model load."""
+    global _pipeline
+    if _pipeline is None:
+        _pipeline = RAGPipeline()
+    return _pipeline

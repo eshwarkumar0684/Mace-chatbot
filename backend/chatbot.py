@@ -4,7 +4,6 @@ import uuid
 from typing import Any, Dict, List, Optional
 
 from backend.config import settings
-from backend.rag_pipeline import rag_pipeline
 from backend.utils import logger
 
 GUEST_USER_ID = "guest"
@@ -167,7 +166,14 @@ def get_conversation_history(conversation_id: str) -> List[Dict[str, Any]]:
     for row in rows:
         row_dict = dict(row)
         if row_dict["sources"]:
-            row_dict["sources"] = json.loads(row_dict["sources"])
+            try:
+                row_dict["sources"] = json.loads(row_dict["sources"])
+            except (json.JSONDecodeError, TypeError):
+                logger.warning(
+                    "Invalid sources JSON for conversation %s; ignoring",
+                    conversation_id,
+                )
+                row_dict["sources"] = None
         history.append(row_dict)
     return history
 
@@ -241,9 +247,11 @@ def orchestrate_chat(conversation_id: str, question: str) -> Dict[str, Any]:
     db_history = get_conversation_history(conversation_id)
     history_formatted = [{"role": msg["role"], "content": msg["content"]} for msg in db_history]
 
-    result = rag_pipeline.generate_response(question, history_formatted)
+    from backend.agent.orchestrator import run_agent
+
+    result = run_agent(conversation_id, question, history_formatted)
     answer = result["response"]
-    sources = result["sources"]
+    sources = result.get("sources", [])
 
     add_message(conversation_id, "user", question)
     add_message(conversation_id, "assistant", answer, sources)
@@ -259,7 +267,7 @@ def orchestrate_chat(conversation_id: str, question: str) -> Dict[str, Any]:
         conn.commit()
         conn.close()
 
-    return {"response": answer, "sources": sources}
+    return {"response": answer, "sources": sources, "agent_metadata": result.get("agent_metadata", {})}
 
 
 init_db()

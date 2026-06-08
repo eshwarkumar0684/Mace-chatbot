@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { api } from "../api/client";
+import BotAvatar from "./BotAvatar";
 
 export default function LeadForm({ onClose }) {
   const [form, setForm] = useState({
@@ -31,26 +32,25 @@ export default function LeadForm({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-lg rounded-xl border border-surface-border bg-surface-elevated p-6 shadow-2xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-100">Request a callback</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded p-1 text-gray-400 hover:bg-gray-800 hover:text-white"
-          >
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/20 p-4 backdrop-blur-sm">
+      <div className="widget-shell w-full max-w-lg p-6 md:p-8">
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <BotAvatar size="header" />
+            <h2 className="text-lg font-semibold text-ink">Request a callback</h2>
+          </div>
+          <button type="button" onClick={onClose} className="btn-icon" aria-label="Close">
             <X size={18} />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
+        <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
           <input
             name="name"
             placeholder="Name"
             value={form.name}
             onChange={handleChange}
             required
-            className="rounded-lg border border-surface-border bg-surface px-3 py-2 text-sm text-gray-100 outline-none focus:border-accent"
+            className="field-input"
           />
           <input
             name="email"
@@ -59,7 +59,7 @@ export default function LeadForm({ onClose }) {
             value={form.email}
             onChange={handleChange}
             required
-            className="rounded-lg border border-surface-border bg-surface px-3 py-2 text-sm text-gray-100 outline-none focus:border-accent"
+            className="field-input"
           />
           <input
             name="phone"
@@ -67,13 +67,13 @@ export default function LeadForm({ onClose }) {
             value={form.phone}
             onChange={handleChange}
             required
-            className="rounded-lg border border-surface-border bg-surface px-3 py-2 text-sm text-gray-100 sm:col-span-2 outline-none focus:border-accent"
+            className="field-input sm:col-span-2"
           />
           <select
             name="course_interest"
             value={form.course_interest}
             onChange={handleChange}
-            className="rounded-lg border border-surface-border bg-surface px-3 py-2 text-sm text-gray-100 sm:col-span-2 outline-none focus:border-accent"
+            className="field-input sm:col-span-2"
           >
             <option>AI & ML with Generative AI</option>
             <option>Data Science with Generative AI</option>
@@ -82,16 +82,14 @@ export default function LeadForm({ onClose }) {
           </select>
           {status && (
             <p
-              className={`text-sm sm:col-span-2 ${status.type === "success" ? "text-green-400" : "text-red-400"}`}
+              className={`text-sm sm:col-span-2 ${
+                status.type === "success" ? "text-emerald-600" : "text-red-600"
+              }`}
             >
               {status.text}
             </p>
           )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-lg bg-accent py-2.5 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60 sm:col-span-2"
-          >
+          <button type="submit" disabled={loading} className="btn-primary py-3 sm:col-span-2">
             {loading ? "Submitting..." : "Submit"}
           </button>
         </form>

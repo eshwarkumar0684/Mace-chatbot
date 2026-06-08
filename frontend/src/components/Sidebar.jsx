@@ -1,9 +1,12 @@
+import { useMemo, useState } from "react";
 import {
   MessageSquarePlus,
   Trash2,
-  PanelLeftClose,
-  PanelLeft,
   Phone,
+  CalendarDays,
+  Search,
+  X,
+  ArrowLeft,
 } from "lucide-react";
 
 export default function Sidebar({
@@ -13,84 +16,125 @@ export default function Sidebar({
   onNewChat,
   onDelete,
   onLead,
-  collapsed,
-  onToggleCollapse,
+  onDemo,
+  drawer = false,
+  onCloseDrawer,
 }) {
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return conversations;
+    return conversations.filter((c) => c.title?.toLowerCase().includes(q));
+  }, [conversations, search]);
+
+  if (!drawer) return null;
+
   return (
-    <aside
-      className={`flex h-full flex-col border-r border-surface-border bg-surface-elevated transition-all ${
-        collapsed ? "w-14" : "w-72"
-      }`}
-    >
-      <div className="flex items-center gap-2 border-b border-surface-border p-3">
-        {!collapsed && (
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-gray-100">MACE AI Academy</p>
-            <p className="truncate text-xs text-gray-400">Course Counselor</p>
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={onToggleCollapse}
-          className="rounded p-2 text-gray-400 hover:bg-gray-800 hover:text-white"
-          title="Toggle sidebar"
-        >
-          {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
+    <div className="absolute inset-0 z-20 flex flex-col bg-surface">
+      <div className="flex items-center justify-between border-b border-surface-border bg-surface px-4 py-3">
+        <button type="button" onClick={onCloseDrawer} className="btn-icon" aria-label="Back to chat">
+          <ArrowLeft size={18} />
+        </button>
+        <p className="text-sm font-semibold text-ink">Chat history</p>
+        <button type="button" onClick={onCloseDrawer} className="btn-icon" aria-label="Close">
+          <X size={18} />
         </button>
       </div>
 
-      <div className="space-y-1 p-2">
+      <div className="space-y-2 border-b border-surface-border bg-surface-muted p-3">
         <button
           type="button"
-          onClick={onNewChat}
-          className="flex w-full items-center gap-2 rounded-lg border border-surface-border px-3 py-2 text-sm text-gray-200 hover:bg-gray-800"
+          onClick={() => {
+            onNewChat();
+            onCloseDrawer?.();
+          }}
+          className="btn-primary w-full py-2.5"
         >
-          <MessageSquarePlus size={16} />
-          {!collapsed && "New chat"}
+          <MessageSquarePlus size={18} />
+          New chat
         </button>
         <button
           type="button"
-          onClick={onLead}
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-300 hover:bg-gray-800"
+          onClick={() => {
+            onDemo?.();
+            onCloseDrawer?.();
+          }}
+          className="btn-primary w-full"
+        >
+          <CalendarDays size={18} />
+          Book free demo
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            onLead();
+            onCloseDrawer?.();
+          }}
+          className="btn-secondary w-full"
         >
           <Phone size={16} />
-          {!collapsed && "Request callback"}
+          Request callback
         </button>
       </div>
 
-      {!collapsed && (
-        <div className="flex-1 overflow-y-auto scrollbar-thin p-2">
-          <p className="mb-2 px-2 text-xs font-medium uppercase tracking-wide text-gray-500">
-            History
+      <div className="px-3 py-2">
+        <div className="flex items-center gap-2 rounded-xl border border-surface-border bg-surface px-3 py-2 shadow-input">
+          <Search size={16} className="shrink-0 text-ink-muted" />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search chats..."
+            className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
+          />
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 pb-4">
+        <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+          History
+        </p>
+        {filtered.length === 0 && (
+          <p className="px-2 py-6 text-center text-sm text-ink-muted">
+            {search ? "No matching chats" : "No conversations yet"}
           </p>
-          {conversations.length === 0 && (
-            <p className="px-2 text-xs text-gray-500">No conversations yet</p>
-          )}
-          {conversations.map((conv) => (
+        )}
+        {filtered.map((conv) => {
+          const isActive = activeId === conv.id;
+          return (
             <div
               key={conv.id}
-              className={`group mb-1 flex items-center gap-1 rounded-lg ${
-                activeId === conv.id ? "bg-gray-800" : "hover:bg-gray-800/60"
+              className={`group mb-1 flex items-center gap-0.5 rounded-xl transition duration-200 ${
+                isActive
+                  ? "bg-accent-light ring-1 ring-accent/30"
+                  : "hover:bg-accent-light/60"
               }`}
             >
               <button
                 type="button"
-                onClick={() => onSelect(conv.id)}
-                className="flex-1 truncate px-3 py-2 text-left text-sm text-gray-200"
+                onClick={() => {
+                  onSelect(conv.id);
+                  onCloseDrawer?.();
+                }}
+                className={`flex-1 truncate px-3 py-2.5 text-left text-sm ${
+                  isActive ? "font-semibold text-accent" : "text-ink"
+                }`}
               >
                 {conv.title}
               </button>
               <button
                 type="button"
                 onClick={() => onDelete(conv.id)}
-                className="mr-1 hidden rounded p-1 text-gray-500 group-hover:block hover:text-red-400"
+                className="mr-1 rounded-lg p-1.5 text-ink-muted opacity-0 transition group-hover:opacity-100 hover:bg-red-50 hover:text-red-600"
+                aria-label="Delete chat"
               >
                 <Trash2 size={14} />
               </button>
             </div>
-          ))}
-        </div>
-      )}
-    </aside>
+          );
+        })}
+      </div>
+    </div>
   );
 }
