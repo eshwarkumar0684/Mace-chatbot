@@ -4,6 +4,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 from backend.agent.graph import get_agent_graph
 from backend.agent.memory import init_agent_tables
+from backend.config import settings
 from backend.utils import logger
 
 _agent_initialized = False
@@ -39,6 +40,7 @@ def run_agent(
         "messages": messages,
         "conversation_id": conversation_id,
         "intent": "",
+        "route": "",
         "plan": [],
         "plan_step": 0,
         "user_profile": {},
@@ -46,10 +48,14 @@ def run_agent(
         "sources": [],
         "agent_metadata": {},
         "final_response": "",
+        "rag_used": False,
     }
 
     graph = get_agent_graph(history, conversation_id)
-    config = {"configurable": {"thread_id": conversation_id}}
+    config = {
+        "configurable": {"thread_id": conversation_id},
+        "recursion_limit": settings.AGENT_MAX_TOOL_STEPS,
+    }
 
     try:
         result = graph.invoke(initial_state, config=config)

@@ -8,7 +8,13 @@ from langchain_groq import ChatGroq
 
 from backend.config import settings
 from backend.ingest import get_embeddings
-from backend.prompts import CONVERSATIONAL_INSTRUCTIONS, RAG_CONTEXT_BLOCK, SYSTEM_PROMPT
+from backend.kb_processor import detect_course_filter, detect_section_filter, expand_query
+from backend.prompts import (
+    CONVERSATIONAL_INSTRUCTIONS,
+    NO_KB_RESPONSE,
+    RAG_CONTEXT_BLOCK,
+    SYSTEM_PROMPT,
+)
 from backend.utils import logger
 
 MAX_HISTORY_TURNS = 12
@@ -42,7 +48,7 @@ class RAGPipeline:
             self.vector_store = Chroma(
                 persist_directory=chroma_dir,
                 embedding_function=self.embeddings,
-                collection_name="mace_academy",
+                collection_name=settings.CHROMA_COLLECTION_NAME,
             )
 
             if settings.GROQ_API_KEY:
@@ -50,7 +56,7 @@ class RAGPipeline:
                 self.llm = ChatGroq(
                     api_key=settings.GROQ_API_KEY,
                     model=settings.MODEL_NAME,
-                    temperature=0.55,
+                    temperature=0.15,
                 )
             else:
                 logger.warning("GROQ_API_KEY not found. Running in simulation mode.")
@@ -62,7 +68,36 @@ class RAGPipeline:
             logger.error("Error initializing RAG Pipeline: %s", e, exc_info=True)
             self.initialized = False
 
-    def retrieve_context(self, query: str, k: int = 4) -> List[Tuple[Document, float]]:
+    def _search(
+        self,
+        query: str,
+        k: int,
+        metadata_filter: Dict[str, str] | None = None,
+    ) -> List[Tuple[Document, float]]:
+        if metadata_filter:
+            return self.vector_store.similarity_search_with_score(
+                query,
+                k=k,
+                filter=metadata_filter,
+            )
+        return self.vector_store.similarity_search_with_score(query, k=k)
+
+    def _merge_results(
+        self,
+        *result_sets: List[Tuple[Document, float]],
+    ) -> List[Tuple[Document, float]]:
+        merged: Dict[str, Tuple[Document, float]] = {}
+        for results in result_sets:
+            for doc, score in results:
+                key = doc.page_content.strip()
+                if key not in merged or score < merged[key][1]:
+                    merged[key] = (doc, score)
+        return sorted(merged.values(), key=lambda item: item[1])
+
+    def retrieve_context(self, query: str, k: int | None = None) -> List[Tuple[Document, float]]:
+        if k is None:
+            k = settings.RAG_TOP_K
+
         if not self.initialized or self.vector_store is None:
             self._initialize_pipeline()
 
@@ -71,9 +106,62 @@ class RAGPipeline:
             return []
 
         try:
-            results = self.vector_store.similarity_search_with_score(query, k=k)
-            logger.info("Retrieved %d chunks for: %s", len(results), query[:80])
-            return results
+            expanded_query = expand_query(query)
+            course_id = detect_course_filter(query)
+            section_filter = detect_section_filter(query)
+            fetch_k = max(settings.RAG_FETCH_K, k * 2)
+
+            result_sets: List[List[Tuple[Document, float]]] = []
+            if course_id:
+                logger.info("RAG course filter detected: %s", course_id)
+                result_sets.append(
+                    self._search(
+                        expanded_query,
+                        k=fetch_k,
+                        metadata_filter={"course_id": course_id},
+                    )
+                )
+            elif section_filter:
+                logger.info("RAG section filter detected: %s", section_filter)
+                result_sets.append(
+                    self._search(expanded_query, k=fetch_k, metadata_filter=section_filter)
+                )
+
+            result_sets.append(self._search(expanded_query, k=fetch_k))
+            merged = self._merge_results(*result_sets)
+
+            relevant = [
+                (doc, score)
+                for doc, score in merged
+                if float(score) <= settings.RAG_SCORE_THRESHOLD
+            ]
+            if not relevant:
+                relevant = merged[:k]
+            else:
+                relevant = relevant[:k]
+
+            scores = [float(score) for _, score in relevant]
+            logger.info(
+                "RAG retrieve: query=%r expanded=%r course_filter=%s chunks=%d top_k=%d scores=%s",
+                query[:120],
+                expanded_query[:160],
+                course_id,
+                len(relevant),
+                k,
+                scores,
+            )
+            for idx, (doc, score) in enumerate(relevant, start=1):
+                source = doc.metadata.get("source", "unknown")
+                course = doc.metadata.get("course_name") or doc.metadata.get("section_type", "")
+                logger.info(
+                    "RAG chunk %d: source=%s course=%s score=%.4f preview=%r",
+                    idx,
+                    os.path.basename(str(source)),
+                    course,
+                    float(score),
+                    doc.page_content[:120],
+                )
+            return relevant
         except Exception as e:
             logger.error("Error searching ChromaDB: %s", e)
             return []
@@ -88,11 +176,14 @@ class RAGPipeline:
                 continue
             seen_contents.add(content)
 
-            source_file = doc.metadata.get("source", "Unknown Source")
+            source_file = doc.metadata.get("source", settings.KNOWLEDGE_BASE_FILE)
             sources.append({
                 "source": os.path.basename(source_file),
                 "content": content,
                 "score": float(score),
+                "course": doc.metadata.get("course_name") or doc.metadata.get("section_title", ""),
+                "course_id": doc.metadata.get("course_id", ""),
+                "section_type": doc.metadata.get("section_type", ""),
             })
         return sources
 
@@ -120,26 +211,36 @@ class RAGPipeline:
         return messages
 
     def generate_response(
-        self, query: str, history: List[Dict[str, str]] = None
+        self,
+        query: str,
+        history: List[Dict[str, str]] | None = None,
+        k: int | None = None,
+        pre_results: List[Tuple[Document, float]] | None = None,
     ) -> Dict[str, Any]:
         if history is None:
             history = []
 
-        results = self.retrieve_context(query)
+        results = pre_results if pre_results is not None else self.retrieve_context(query, k=k)
         sources = self.format_sources(results)
 
+        if not sources:
+            logger.info("RAG generate: no relevant context for query=%r", query[:120])
+            return {"response": NO_KB_RESPONSE, "sources": []}
+
         context_text = "\n\n".join(
-            f"Source: {src['source']}\nContent: {src['content']}" for src in sources
+            f"Source: {src['source']} | Section: {src.get('course') or src.get('section_type', 'general')}\n"
+            f"Content: {src['content']}"
+            for src in sources
         )
-        if not context_text:
-            context_text = "No relevant context found in MACE AI Academy knowledge base."
 
         if self.llm:
             try:
                 messages = self._build_messages(query, context_text, history)
                 logger.info("Sending conversational prompt (%d messages)...", len(messages))
                 response = self.llm.invoke(messages)
-                response_text = response.content
+                response_text = response.content.strip()
+                if not response_text:
+                    response_text = NO_KB_RESPONSE
             except Exception as e:
                 logger.error("Groq API call failed: %s", e)
                 response_text = (
@@ -154,33 +255,12 @@ class RAGPipeline:
     def _mock_rag_response(
         self, query: str, context: str, history: List[Dict[str, str]]
     ) -> str:
-        if "no relevant context found" in context.lower() or not context.strip():
-            return (
-                "I don't have that detail in our materials right now. "
-                "I'd be happy to tell you about our courses, fees, or placement support — what interests you most?"
-            )
+        if not context.strip():
+            return NO_KB_RESPONSE
 
-        greeting = ""
-        if not history:
-            greeting = "Hi! Thanks for reaching out to MACE AI Academy. "
-
-        lines = context.split("\n")
-        matching = [
-            line.strip()
-            for line in lines
-            if line.strip()
-            and any(
-                term in line.lower()
-                for term in ["fee", "duration", "course", "placement", "month", "inr"]
-            )
-        ][:6]
-
-        raw = matching if matching else [context[:300]]
-        bullets = "\n".join(f"- {line[:120].strip()}" for line in raw[:6] if line.strip())
-        return (
-            f"{greeting}Here's what I can share:\n\n{bullets}\n\n"
-            "Want details on fees, syllabus, or placements?"
-        )
+        lines = [line.strip() for line in context.split("\n") if line.strip()]
+        bullets = "\n".join(f"- {line[:140]}" for line in lines[:6])
+        return bullets or NO_KB_RESPONSE
 
 
 _pipeline: RAGPipeline | None = None

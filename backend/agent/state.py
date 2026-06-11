@@ -10,6 +10,7 @@ class AgentState(TypedDict):
     messages: Annotated[List[BaseMessage], add_messages]
     conversation_id: str
     intent: str
+    route: str
     plan: List[str]
     plan_step: int
     user_profile: Dict[str, Any]
@@ -17,3 +18,4 @@ class AgentState(TypedDict):
     sources: List[Dict[str, Any]]
     agent_metadata: Dict[str, Any]
     final_response: str
+    rag_used: bool

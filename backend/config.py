@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     # Production: use a verified domain address, e.g. MACE AI Academy <noreply@yourdomain.com>
     EMAIL_FROM: str = ""
     AGENT_MAX_TOOL_STEPS: int = 8
+    RAG_TOP_K: int = 6
+    RAG_FETCH_K: int = 18
+    RAG_CHUNK_SIZE: int = 900
+    RAG_CHUNK_OVERLAP: int = 150
+    RAG_SCORE_THRESHOLD: float = 1.35
+    KNOWLEDGE_BASE_FILE: str = "mace_knowledge_base.docx"
+    CHROMA_COLLECTION_NAME: str = "mace_academy"
 
     model_config = SettingsConfigDict(
         env_file=(str(_ENV_ROOT), str(_ENV_BACKEND)),
