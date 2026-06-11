@@ -35,6 +35,33 @@ STATIC_SECTIONS: Tuple[Tuple[str, str, str], ...] = (
     ("# Courses Offered", "courses_overview", "Courses Offered"),
 )
 
+SUPPLEMENTAL_FILE_META: Dict[str, Dict[str, str]] = {
+    "faq.txt": {
+        "section_type": "faq",
+        "course_id": "faq",
+        "course_name": "General FAQs",
+        "section_title": "General FAQs",
+    },
+    "ai_course.txt": {
+        "section_type": "course",
+        "course_id": "ai_ml",
+        "course_name": "AI & ML with Generative AI",
+        "section_title": "AI & ML with Generative AI",
+    },
+    "data_science.txt": {
+        "section_type": "course",
+        "course_id": "data_science",
+        "course_name": "Data Science with Generative AI",
+        "section_title": "Data Science with Generative AI",
+    },
+    "analytics.txt": {
+        "section_type": "course",
+        "course_id": "data_analytics",
+        "course_name": "Data Analytics with Generative AI",
+        "section_title": "Data Analytics with Generative AI",
+    },
+}
+
 COURSE_QUERY_ALIASES: Dict[str, str] = {
     "ai/ml": "Artificial Intelligence Machine Learning",
     "ai & ml": "Artificial Intelligence Machine Learning",
@@ -60,6 +87,15 @@ COURSE_QUERY_ALIASES: Dict[str, str] = {
     "prerequisite": "Prerequisites",
     "qualification": "Qualification Required",
     "module": "Modules",
+    "fee": "Fee Structure EMI Payment",
+    "fees": "Fee Structure EMI Payment",
+    "cost": "Fee Structure Course Fee INR",
+    "price": "Fee Structure Course Fee INR",
+    "duration": "Course Duration Months Weeks",
+    "how long": "Course Duration Months Weeks",
+    "placement": "Placement Assistance Support",
+    "emi": "Easy Monthly Installments EMI",
+    "payment": "Fee Payment Structure",
 }
 
 
@@ -96,13 +132,34 @@ def _split_on_markers(text: str, markers: List[str]) -> List[Tuple[str, str]]:
     return sections
 
 
+def _strip_repeated_identity_blocks(text: str) -> str:
+    """Remove repeated chatbot-identity boilerplate embedded between course sections."""
+    marker = "# MACE AI Academy Chatbot Identity"
+    parts = re.split(re.escape(marker), text, flags=re.IGNORECASE)
+    if len(parts) <= 1:
+        return text
+    cleaned = parts[0]
+    for part in parts[1:]:
+        # Keep content after the identity block up to the next real section heading.
+        match = re.search(
+            r"(?:#\s|WHAT IS )",
+            part,
+            flags=re.IGNORECASE,
+        )
+        if match:
+            cleaned += part[match.start() :]
+    return cleaned
+
+
 def extract_unique_sections(raw_text: str) -> List[Tuple[str, str, Dict[str, str]]]:
     """Extract deduplicated logical sections from the raw knowledge base text."""
     text = raw_text.replace("\r\n", "\n")
-    # Drop repeated chatbot-identity boilerplate blocks; keep the first overview block.
-    intro_split = re.split(r"# MACE AI Academy Chatbot Identity", text, maxsplit=1)
+    text = _strip_repeated_identity_blocks(text)
+    # Drop the leading chatbot-identity block; keep the overview that precedes it.
+    intro_split = re.split(r"# MACE AI Academy Chatbot Identity", text, maxsplit=1, flags=re.IGNORECASE)
     preamble = intro_split[0].strip()
     remainder = intro_split[1] if len(intro_split) > 1 else text
+    remainder = _strip_repeated_identity_blocks(remainder)
 
     seen: set[str] = set()
     course_best: Dict[str, Tuple[str, str, Dict[str, str]]] = {}
@@ -227,6 +284,40 @@ def chunk_knowledge_base(raw_text: str) -> List[Document]:
     return documents
 
 
+def chunk_supplemental_document(filename: str, raw_text: str) -> List[Document]:
+    """Chunk a supplemental data file (FAQ, course prospectus, etc.)."""
+    meta = SUPPLEMENTAL_FILE_META.get(filename)
+    if not meta or not raw_text.strip():
+        return []
+
+    header = _build_section_header(meta["section_title"], meta)
+    enriched_body = f"{header}\n\n{raw_text.strip()}"
+    base_meta = {
+        "source": filename,
+        "section_title": meta["section_title"],
+        "section_type": meta["section_type"],
+        "course_id": meta["course_id"],
+        "course_name": meta["course_name"],
+    }
+
+    if len(enriched_body) <= settings.RAG_CHUNK_SIZE:
+        return [Document(page_content=enriched_body, metadata=dict(base_meta))]
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=settings.RAG_CHUNK_SIZE,
+        chunk_overlap=settings.RAG_CHUNK_OVERLAP,
+        length_function=len,
+        add_start_index=True,
+        separators=["\n\n", "\n", ". ", ", ", " "],
+    )
+    documents: List[Document] = []
+    for idx, chunk in enumerate(splitter.split_text(enriched_body)):
+        chunk_meta = dict(base_meta)
+        chunk_meta["chunk_index"] = str(idx)
+        documents.append(Document(page_content=chunk, metadata=chunk_meta))
+    return documents
+
+
 def expand_query(query: str) -> str:
     """Add course/topic aliases to improve embedding retrieval."""
     lowered = query.lower()
@@ -281,4 +372,21 @@ def detect_section_filter(query: str) -> Dict[str, str] | None:
         return {"section_type": "trainers"}
     if any(term in lowered for term in ("courses offered", "what courses", "programs offered")):
         return {"section_type": "courses_overview"}
+    if any(
+        term in lowered
+        for term in (
+            "fee",
+            "fees",
+            "emi",
+            "payment",
+            "how much",
+            "cost",
+            "price",
+            "placement",
+            "duration",
+            "how long",
+            "installment",
+        )
+    ):
+        return {"section_type": "faq"}
     return None

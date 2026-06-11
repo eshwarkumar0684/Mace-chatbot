@@ -13,7 +13,11 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
 from backend.config import settings
-from backend.kb_processor import chunk_knowledge_base
+from backend.kb_processor import (
+    SUPPLEMENTAL_FILE_META,
+    chunk_knowledge_base,
+    chunk_supplemental_document,
+)
 from backend.utils import logger
 
 
@@ -59,6 +63,26 @@ def load_primary_knowledge_base(data_dir: str) -> List[Document]:
     return chunks
 
 
+def load_supplementary_documents(data_dir: str) -> List[Document]:
+    """Load FAQ and course prospectus files that complement the primary KB docx."""
+    chunks: List[Document] = []
+    for filename in sorted(SUPPLEMENTAL_FILE_META):
+        file_path = os.path.join(data_dir, filename)
+        if not os.path.isfile(file_path):
+            logger.warning("Supplemental knowledge file missing: %s", file_path)
+            continue
+
+        raw_docs = load_single_document(file_path)
+        if not raw_docs:
+            continue
+
+        file_chunks = chunk_supplemental_document(filename, raw_docs[0].page_content)
+        chunks.extend(file_chunks)
+        logger.info("Loaded supplemental file %s (%d chunks)", filename, len(file_chunks))
+
+    return chunks
+
+
 def get_embeddings():
     """Load the sentence transformer embedding model."""
     logger.info("Initializing embedding model: %s", settings.EMBEDDING_MODEL)
@@ -85,9 +109,16 @@ def rebuild_vector_db() -> bool:
             os.makedirs(data_dir)
 
         chunks = load_primary_knowledge_base(data_dir)
+        supplemental = load_supplementary_documents(data_dir)
+        chunks.extend(supplemental)
         if not chunks:
             logger.warning("No knowledge base chunks created.")
             return False
+        logger.info(
+            "Prepared %d total chunks (primary + %d supplemental)",
+            len(chunks),
+            len(supplemental),
+        )
 
         embeddings = get_embeddings()
         chroma_dir = os.path.abspath(settings.CHROMA_DB_DIR)

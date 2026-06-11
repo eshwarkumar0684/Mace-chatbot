@@ -51,6 +51,22 @@ class RAGPipeline:
                 collection_name=settings.CHROMA_COLLECTION_NAME,
             )
 
+            try:
+                doc_count = self.vector_store._collection.count()
+                if doc_count == 0:
+                    logger.warning(
+                        "Vector store collection '%s' is empty. Run: python -m backend.ingest",
+                        settings.CHROMA_COLLECTION_NAME,
+                    )
+                else:
+                    logger.info(
+                        "Vector store ready: collection=%s documents=%d",
+                        settings.CHROMA_COLLECTION_NAME,
+                        doc_count,
+                    )
+            except Exception:
+                pass
+
             if settings.GROQ_API_KEY:
                 logger.info("Initializing Groq LLM with model: %s", settings.MODEL_NAME)
                 self.llm = ChatGroq(

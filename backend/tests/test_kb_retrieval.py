@@ -14,6 +14,9 @@ SAMPLE_QUERIES = [
     ("What is Vibe Coding?", {"course_id": "vibe_coding"}, "Vibe Coding"),
     ("What is AI Product Management?", {"course_id": "ai_product_management"}, "AI Product Management"),
     ("What is Data Engineering?", {"course_id": "data_engineering"}, "Data Engineering"),
+    ("What are the fees?", {"section_type": "faq"}, "INR"),
+    ("Do you offer placement support?", {"section_type": "faq"}, "Placement Assistance"),
+    ("What is the duration of the Data Science program?", {"course_id": "data_science"}, "Months"),
 ]
 
 
@@ -26,6 +29,11 @@ def _metadata_matches(source: dict, expected: dict) -> bool:
     if "section_type" in expected:
         return source.get("section_type") == expected["section_type"]
     return False
+
+
+def _snippet_in_sources(sources: list, expected_snippet: str) -> bool:
+    haystack = " ".join(s["content"] for s in sources).lower()
+    return expected_snippet.lower() in haystack
 
 
 def run_retrieval_tests() -> None:
@@ -41,7 +49,7 @@ def run_retrieval_tests() -> None:
 
         top = sources[0]
         meta_ok = any(_metadata_matches(src, expected_meta) for src in sources)
-        snippet_ok = expected_snippet.lower() in " ".join(s["content"] for s in sources).lower()
+        snippet_ok = _snippet_in_sources(sources, expected_snippet)
 
         if meta_ok and snippet_ok:
             print(
