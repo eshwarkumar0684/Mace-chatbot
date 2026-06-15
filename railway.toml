@@ -1,0 +1,15 @@
+# Railway — deploy from repository root (not backend/).
+# Dashboard equivalent:
+#   Root Directory: (empty)
+#   Build Command:  bash railway_build.sh
+#   Start Command:  uvicorn app:app --host 0.0.0.0 --port $PORT
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "bash railway_build.sh"
+
+[deploy]
+startCommand = "uvicorn app:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"

@@ -1,4 +1,4 @@
-"""ASGI entrypoint for platforms that run `uvicorn app:app` from the repository root."""
+"""ASGI entrypoint for Railway — run `uvicorn app:app` from the repository root."""
 
 from backend.app import app
 
